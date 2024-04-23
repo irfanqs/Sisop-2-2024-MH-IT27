@@ -17,6 +17,7 @@ List Soal:
 ## Soal 2
 ### Penjelasan
 pertama buat **setup.c**
+
 berikut keseluruhan isi dari **setup.c**
 ```c
 #include <stdio.h>
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
 ```c
 
 #### Fungsi `launch_applications`

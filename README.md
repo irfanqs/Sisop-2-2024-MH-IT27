@@ -296,10 +296,25 @@ Menghentikan aplikasi sesuai yang dibuka oleh file konfigurasi, gunakan perintah
 ```
 
 
-
-**Hasil Output**
-
 **Dokumentasi**
+
+*1. Tampilan Terminal*
+![Screenshot from 2024-04-24 15-37-16](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/79549192/71df56a4-2989-4864-abc7-bfdbd0856750)
+
+*2. Tampilan ketika melakukan perintah `./setup -o firefox 2 wieshark 2`*
+![Screenshot from 2024-04-24 15-41-20](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/79549192/d9a101f3-c746-4f6b-8d7c-520a0f4f63d9)
+
+*3. Tampilan ketika melakukan perintah `./setup -f file.conf` isi `file.conf` adalah `wireshark 1` sehingga apk wireshark ketambah 1 dan menjadi 3 jendela*
+![Screenshot from 2024-04-24 15-41-48](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/79549192/db86db04-1f33-47dc-bb39-a7fdebe1b660)
+
+*4. Tampilan ketika melakukan perintah `./setup -k file.conf` perintah ini hanya mematikan perintah dari file.conf sehingga wireshark dimatikan 1 jendela*
+![Screenshot from 2024-04-24 15-42-15](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/79549192/a3c6e414-22af-4e4a-829f-fdf1f2905ce2)
+
+*5. Tampilan ketika kill keseluruhan dengan perintah `./setup -k` maka semua tab yang dibuka akan mati/tertutup*
+![Screenshot from 2024-04-24 15-42-37](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/79549192/f79f7cd1-1ae7-4db4-b7e1-5f9c7f5d63c4)
+
+
+
 
 ### Kendala
 Tidak ada kendala pada nomor ini

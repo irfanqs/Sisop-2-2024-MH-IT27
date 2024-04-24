@@ -16,7 +16,7 @@ List Soal:
 ## Soal 1
 ## Soal 2
 ### Penjelasan
-buat **setup.c**
+### 1. buat **setup.c**
 
 berikut keseluruhan isi dari **setup.c**
 ```c
@@ -257,17 +257,52 @@ int main(int argc, char *argv[]) {
 ```
 
 
-buat `file.conf`
-untuk membuka aplikasi dengan argumen khusus sesuai file.conf dengan format `app num`
+### 2. Kompilasi Program
+pada terminal lakukan komplikasi file `setupc.` dengan `gcc setup.c -o setup`. untuk menjalankan program atau Membuka aplikasi
 
-lalu pada terminal lakukan command `gcc setup.c -o setup`
-Ketika 
+### 3. Menjalankan Program
+**a. Membuka Aplikasi**
+
+membuka aplikasi dengan menggunakan sintaks `-o` diikuti dengan nama aplikasi dan jumlah instansi yang ingin dibuka. contoh
+```c
+./setup -o firefox 2 wireshark 3
+```
+ini akan membuka dua instansi dari firefox dan tiga instansi dari wireshark
+
+**b. Membuka Aplikasi Melalui File Konfigurasi**
+
+menjalankan aplikasi berdasarkan konfigurasi dari file. Misalnya, telah membuat filw `file.conf` dengan isi sebagai berikut:
+```c
+wireshark 2
+firefox 1
+```
+dan menjalankan program tersebut dengan perintah 
+```c
+./setup -f file.conf
+```
+ini akan membuka dua instansi wireshark dan satu instansi firefox
+
+**c. Menghentikan Semua Aplikasi**
+
+Untuk menghentikan semua aplikasi yang telah dibuka oleh program ini:
+```c
+./setup -k
+```
+**d. Menghentikan Aplikasi Tertentu Melalui FIle Konfigurasi**
+
+Menghentikan aplikasi sesuai yang dibuka oleh file konfigurasi, gunakan perintah:
+```c
+./setup -k file.conf
+```
+
+
 
 **Hasil Output**
 
 **Dokumentasi**
 
 ### Kendala
+Tidak ada kendala pada nomor ini
 
 ### Revisi
-
+Tidak ada Revisi pada nomor ini

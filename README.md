@@ -147,7 +147,8 @@ int main(int argc, char *argv[]) {
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
-#include <dirent.h>```
+#include <dirent.h>
+```
 - Kemudian kita membuat fungsi `gantiString`. Fungsi ini bertujuan untuk mengganti string lama yang disimpan ke dalam variable `strAneh` menjadi string baru yang disimpan ke dalam variable `strNew`. Cara kerja fungsi ini adalah dengan menganalisis tiap line pada sebuah file dan jika ada kata yang namanya sama dengan variable `strAneh`, maka kata tersebut diganti dengan variable `strNew` dengan cara menghapus kata tersebut dan menggantinya dengan kata baru sesuai posisi yang telah ditentukan oleh char `pos`.
 ```// Fungsi untuk mengganti string
 void gantiString(char *line, const char *strAneh, const char *strNew) {
@@ -162,7 +163,8 @@ void gantiString(char *line, const char *strAneh, const char *strNew) {
         memcpy(pos, strNew, strNewLen);
         line += strNewLen;
     }
-}```
+}
+```
 - Selanjutnya adalah membuat fungsi `editLogFile`. Fungsi ini bertujuan untuk mengubah isi file virus.log dengan format yang telah ditentukan.
 ```// Fungsi untuk mencatat waktu perubahan file ke virus.log
 void editLogFile(const char *filename, const char *timestamp) {
@@ -171,7 +173,8 @@ void editLogFile(const char *filename, const char *timestamp) {
         fprintf(log, "[%s] Suspicious string at %s successfully replaced!\n", timestamp, filename);
         fclose(log);
     }
-}```
+}
+```
 - Sekarang kita masuk ke dalam fungsi `main`, pertama-tama kita perlu menginisisasi variable yang diperlukan.
 ```    // Inisiasi variable
     const char *strMalware = "m4LwAr3";
@@ -207,7 +210,8 @@ void editLogFile(const char *filename, const char *timestamp) {
 
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
-    close(STDERR_FILENO);```
+    close(STDERR_FILENO);
+```
 -  Lalu kita akan membuat while loop yang memiliki jeda 15 detik. Dalam loop tersebut, program akan membuka folder dan menganalisis tiap file di dalamnya. Jika dalam sebuah file terdapat string aneh seperti `m4LwAr3`, `5pYw4R3`, dan `R4nS0mWaR3`, maka akan langsung diganti dengan string baru. Proses ini dijalankan oleh fungsi **gantiString**. Kemudian program akan mencatat waktu pergantian string tersebut dan menuliskannya ke file log dengan memanfaatkan fungsi **editLogFile**. Jika sudah selesai, maka program akan melanjutkan ke file berikutnya. Karena program ini akan berjalan terus menerus, maka kita harus kill pid nya lewat terminal.
 ```   // looping untuk masuk ke dalam directory
     while(1) {
@@ -258,7 +262,8 @@ void editLogFile(const char *filename, const char *timestamp) {
             }
         }
     }
-  return 0;```
+  return 0;
+```
 ## Soal 2
 ### Penjelasan
 ### 1. buat **setup.c**

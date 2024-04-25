@@ -25,6 +25,7 @@ Program harus berjalan secara daemon, dan tidak diperbolehkan menggunakan comman
 Program akan secara terus menerus berjalan di background dengan jeda 15 detik
 Catat setiap penghapusan string yang dilakukan oleh program pada sebuah file bernama virus.log dengan format: [dd-mm-YYYY][HH:MM:SS] Suspicious string at <file_name> successfully replaced!
 </details><br>
+ 
 ### Penjelasan
 Berikut merupakan isi dari file **virus.c**.
 ```c

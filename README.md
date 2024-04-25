@@ -16,7 +16,7 @@ List Soal:
 ## Soal 1
 ### Penjelasan
 Berikut merupakan isi dari file **virus.c**.
-```
+```c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 - Hal pertama yang perlu dilakukan adalah import semua library yang dibutuhkan
- ```
+ ```c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
 #include <dirent.h>
 ```
 - Kemudian kita membuat fungsi `gantiString`. Fungsi ini bertujuan untuk mengganti string lama yang disimpan ke dalam variable `strAneh` menjadi string baru yang disimpan ke dalam variable `strNew`. Cara kerja fungsi ini adalah dengan menganalisis tiap line pada sebuah file dan jika ada kata yang namanya sama dengan variable `strAneh`, maka kata tersebut diganti dengan variable `strNew` dengan cara menghapus kata tersebut dan menggantinya dengan kata baru sesuai posisi yang telah ditentukan oleh char `pos`.
-```
+```c
 // Fungsi untuk mengganti string
 void gantiString(char *line, const char *strAneh, const char *strNew) {
     char *pos;
@@ -169,7 +169,7 @@ void gantiString(char *line, const char *strAneh, const char *strNew) {
 }
 ```
 - Selanjutnya adalah membuat fungsi `editLogFile`. Fungsi ini bertujuan untuk mengubah isi file virus.log dengan format yang telah ditentukan.
-```
+```c
 // Fungsi untuk mencatat waktu perubahan file ke virus.log
 void editLogFile(const char *filename, const char *timestamp) {
     FILE *log = fopen("/home/irfanqs/modul2/soal_1/virus.log", "a"); // a = append
@@ -180,7 +180,7 @@ void editLogFile(const char *filename, const char *timestamp) {
 }
 ```
 - Sekarang kita masuk ke dalam fungsi `main`, pertama-tama kita perlu menginisisasi variable yang diperlukan.
-```
+```c
 // Inisiasi variable
     const char *strMalware = "m4LwAr3";
     const char *strSpyware = "5pYw4R3";
@@ -192,7 +192,7 @@ void editLogFile(const char *filename, const char *timestamp) {
     const char *dir = argv[1];
 ```
 - Di dalam fungsi ini, kita perlu membuat fungsi *daemon* karena kita ingin program berjalan secara daemon.
-```
+```c
 // Daemon process
     pid_t pid, sid; 
     pid = fork();
@@ -219,7 +219,7 @@ void editLogFile(const char *filename, const char *timestamp) {
     close(STDERR_FILENO);
 ```
 -  Lalu kita akan membuat while loop yang memiliki jeda 15 detik. Dalam loop tersebut, program akan membuka folder dan menganalisis tiap file di dalamnya. Jika dalam sebuah file terdapat string aneh seperti `m4LwAr3`, `5pYw4R3`, dan `R4nS0mWaR3`, maka akan langsung diganti dengan string baru. Proses ini dijalankan oleh fungsi **gantiString**. Kemudian program akan mencatat waktu pergantian string tersebut dan menuliskannya ke file log dengan memanfaatkan fungsi **editLogFile**. Jika sudah selesai, maka program akan melanjutkan ke file berikutnya. Karena program ini akan berjalan terus menerus, maka kita harus kill pid nya lewat terminal.
-```
+```c
    // looping untuk masuk ke dalam directory
     while(1) {
         DIR *dp = opendir(dir);

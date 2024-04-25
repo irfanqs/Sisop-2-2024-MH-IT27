@@ -905,10 +905,10 @@ Selanjutnya, kita akan mencoba `./admin -m <user>` dan mengecek <user>.log
 <br>Isi file irfanqs.log<br>
 ![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/1024ab50-d031-4bf0-b26f-f35dd376eb5a)
 
-Selanjutnya, kita akan mencoba `./admin -s <user>' untuk membunuh proses sebelumnya
+Selanjutnya, kita akan mencoba `./admin -s <user>`untuk membunuh proses sebelumnya
 ![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/ab076f5a-2eb4-439a-b919-8b552c081d3f)
+<br>Proses sebelumnya terbunuh<br>
 ![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/c686d028-06d1-4b5b-9236-49fa289dfd37)
-<br>Proses sebelumnya terbunuh
 
 Selanjutnya kita akan mencoba membunuh semua proses dengan `./admin -c <user>` dengan jeda satu detik
 ![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/8f3d8ef7-04b9-4497-ab72-cc7932540f0c)

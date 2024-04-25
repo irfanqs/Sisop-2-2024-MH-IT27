@@ -1,4 +1,4 @@
-# Sisop-2-2024-MH-IT27
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/85a05963-8769-4cc7-b853-47eae0acfe66)# Sisop-2-2024-MH-IT27
 Anggota Kelompok :
 |  NRP|Nama Anggota  |
 |--|--|
@@ -264,6 +264,27 @@ void editLogFile(const char *filename, const char *timestamp) {
     }
   return 0;
 ```
+Untuk cara menjalankannya, kita dapat menjalankannya dengan cara `./virus` beserta dengan direktori yang ingin kita ubah nilainya.
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/862b96ab-7fbb-4d64-a166-a71efa1afd16)
+
+Setelah itu kita tunggu selama beberapa detik agar file terubah namanya.
+*File sebelum*
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/95a9b45d-d2e1-4763-85e1-a03baefc0261)
+
+*File Sesudah*
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/0fc88d17-9b40-4f3d-b197-733015a0ae74)
+
+Jika kita telah melihat semua file terubah stringnya, kita perlu kill pid dari virus tersebut atau pkill dengan nama programnya.
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/0d24862b-3bf6-4333-8f66-831843d7cc7b)
+
+Setelah itu, kita dapat cek isi file virus.log untuk melihat perubahan apa saja yang dibuat. Program terlihat menjalankan fungsi setelah jeda 15 detik.
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/158997c0-2a50-498e-941a-a7d50e3e0300)
+
+### Kendala
+Tidak ada kendala pada soal ini
+### Revisi
+Tidak ada revisi pada soal ini
+
 ## Soal 2
 ### Penjelasan
 ### 1. buat **setup.c**

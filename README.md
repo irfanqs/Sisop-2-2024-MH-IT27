@@ -16,7 +16,8 @@ List Soal:
 ## Soal 1
 ### Penjelasan
 Berikut merupakan isi dari file **virus.c**.
-```#include <stdio.h>
+```
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -139,7 +140,8 @@ int main(int argc, char *argv[]) {
 }
 ```
 - Hal pertama yang perlu dilakukan adalah import semua library yang dibutuhkan
- ```#include <stdio.h>
+ ```
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -150,7 +152,8 @@ int main(int argc, char *argv[]) {
 #include <dirent.h>
 ```
 - Kemudian kita membuat fungsi `gantiString`. Fungsi ini bertujuan untuk mengganti string lama yang disimpan ke dalam variable `strAneh` menjadi string baru yang disimpan ke dalam variable `strNew`. Cara kerja fungsi ini adalah dengan menganalisis tiap line pada sebuah file dan jika ada kata yang namanya sama dengan variable `strAneh`, maka kata tersebut diganti dengan variable `strNew` dengan cara menghapus kata tersebut dan menggantinya dengan kata baru sesuai posisi yang telah ditentukan oleh char `pos`.
-```// Fungsi untuk mengganti string
+```
+// Fungsi untuk mengganti string
 void gantiString(char *line, const char *strAneh, const char *strNew) {
     char *pos;
     int strAnehLen = strlen(strAneh);
@@ -166,7 +169,8 @@ void gantiString(char *line, const char *strAneh, const char *strNew) {
 }
 ```
 - Selanjutnya adalah membuat fungsi `editLogFile`. Fungsi ini bertujuan untuk mengubah isi file virus.log dengan format yang telah ditentukan.
-```// Fungsi untuk mencatat waktu perubahan file ke virus.log
+```
+// Fungsi untuk mencatat waktu perubahan file ke virus.log
 void editLogFile(const char *filename, const char *timestamp) {
     FILE *log = fopen("/home/irfanqs/modul2/soal_1/virus.log", "a"); // a = append
     if (log != NULL) {
@@ -176,7 +180,8 @@ void editLogFile(const char *filename, const char *timestamp) {
 }
 ```
 - Sekarang kita masuk ke dalam fungsi `main`, pertama-tama kita perlu menginisisasi variable yang diperlukan.
-```    // Inisiasi variable
+```
+// Inisiasi variable
     const char *strMalware = "m4LwAr3";
     const char *strSpyware = "5pYw4R3";
     const char *strRansomware = "R4nS0mWaR3";
@@ -187,7 +192,8 @@ void editLogFile(const char *filename, const char *timestamp) {
     const char *dir = argv[1];
 ```
 - Di dalam fungsi ini, kita perlu membuat fungsi *daemon* karena kita ingin program berjalan secara daemon.
-```// Daemon process
+```
+// Daemon process
     pid_t pid, sid; 
     pid = fork();
 
@@ -213,7 +219,8 @@ void editLogFile(const char *filename, const char *timestamp) {
     close(STDERR_FILENO);
 ```
 -  Lalu kita akan membuat while loop yang memiliki jeda 15 detik. Dalam loop tersebut, program akan membuka folder dan menganalisis tiap file di dalamnya. Jika dalam sebuah file terdapat string aneh seperti `m4LwAr3`, `5pYw4R3`, dan `R4nS0mWaR3`, maka akan langsung diganti dengan string baru. Proses ini dijalankan oleh fungsi **gantiString**. Kemudian program akan mencatat waktu pergantian string tersebut dan menuliskannya ke file log dengan memanfaatkan fungsi **editLogFile**. Jika sudah selesai, maka program akan melanjutkan ke file berikutnya. Karena program ini akan berjalan terus menerus, maka kita harus kill pid nya lewat terminal.
-```   // looping untuk masuk ke dalam directory
+```
+   // looping untuk masuk ke dalam directory
     while(1) {
         DIR *dp = opendir(dir);
         struct dirent *ep;
@@ -267,7 +274,7 @@ void editLogFile(const char *filename, const char *timestamp) {
 Untuk cara menjalankannya, kita dapat menjalankannya dengan cara `./virus` beserta dengan direktori yang ingin kita ubah nilainya.
 ![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/862b96ab-7fbb-4d64-a166-a71efa1afd16)
 
-Setelah itu kita tunggu selama beberapa detik agar file terubah namanya.
+Setelah itu kita tunggu selama beberapa detik agar file terubah namanya.<br>
 *File sebelum* <br>
 ![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/95a9b45d-d2e1-4763-85e1-a03baefc0261)
 <br>

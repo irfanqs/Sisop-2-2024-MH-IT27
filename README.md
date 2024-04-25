@@ -369,6 +369,565 @@ sehingga user tidak bisa menjalankan proses yang dia inginkan dengan baik. Fitur
 Ketika proses yang dijalankan user digagalkan, program juga akan melog dan menset log tersebut sebagai GAGAL. Dan jika di log menggunakan fitur poin c, log akan ditulis dengan JALAN
 </details>
 
+### Penjelasan
+- Berikut merupakan isi file dari **admin.c**
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <errno.h>
+
+void psUserToTerminal(const char *namaUser) {
+    // Membuat command untuk mendapatkan informasi proses
+    char command[100];
+    snprintf(command, 100, "ps -u %s -o user,pid,comm", namaUser);
+
+    // Menjalankan command dan menulis output langsung ke terminal
+    FILE *fp = popen(command, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Error: Unable to execute command.\n");
+        return;
+    }
+
+    char output[100];
+    while (fgets(output, sizeof(output), fp) != NULL) {
+        printf("%s", output); // Output langsung ke terminal
+    }
+
+    // Menutup pipe
+    pclose(fp);
+}
+
+void psUserToTXT(const char *namaUser) {
+    // Membuat command untuk mendapatkan informasi proses
+    char command[100];
+    snprintf(command, 100, "ps -u %s -o user,pid,comm --no-headers", namaUser);
+
+    // Membuka file ps_user.txt untuk menulis
+    FILE *outputFile = fopen("ps_user.txt", "w");
+    if (outputFile == NULL) {
+        fprintf(stderr, "Error: Unable to open or create output file.\n");
+        return;
+    }
+
+    // Menjalankan command dan menulis output ke file
+    FILE *fp = popen(command, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Error: Unable to execute command.\n");
+        fclose(outputFile);
+        return;
+    }
+
+    char output[100];
+    while (fgets(output, sizeof(output), fp) != NULL) {
+        fprintf(outputFile, "%s", output);
+    }
+
+    // Menutup file dan pipe
+    pclose(fp);
+    fclose(outputFile);
+}
+
+void psUserToLog(const char *namaUser) {
+    pid_t pid, sid; 
+    pid = fork(); 
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+    umask(0);
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if ((chdir("/home/irfanqs/modul2/soal_3")) < 0) {
+        exit(EXIT_FAILURE);
+    }
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+  
+    // Membuat nama file log
+    char logFileName[100];
+    snprintf(logFileName, 100, "/home/irfanqs/modul2/soal_3/%s.log", namaUser);
+
+    // Menghapus file ps_user.txt (jika ada)
+    remove("ps_user.txt");
+
+    // Loop utama
+    while(1) {
+        // Memanggil fungsi untuk menulis ps_user.txt
+        psUserToTXT(namaUser);
+
+        // Membuka file log untuk ditulis
+        FILE *logFile = fopen(logFileName, "a");
+        if (logFile == NULL) {
+            fprintf(stderr, "Error: Unable to open or create log file.\n");
+            return;
+        }
+
+        // Menyimpan timestamp saat ini
+        time_t now;
+        struct tm *tm_info;
+        time(&now);
+        tm_info = localtime(&now);
+        char timestamp[100];
+        strftime(timestamp, 100, "%d:%m:%Y-%H:%M:%S", tm_info);
+
+        // Membuka file ps_user.txt untuk dibaca
+        FILE *psFile = fopen("/home/irfanqs/modul2/soal_3/ps_user.txt", "r");
+        if (psFile == NULL) {
+            fprintf(stderr, "Error: Unable to open ps_user.txt.\n");
+            fclose(logFile);
+            return;
+        }
+
+        // Membaca setiap baris dari file ps_user.txt dan menulis ke file log
+        char line[100];
+        while ((fgets(line, sizeof(line), psFile) != NULL)) {
+            // Memecah baris menjadi token
+            char *nameToken = strtok(line, " ");
+            char *pidToken = strtok(NULL, " ");
+            char *processNameToken = strtok(NULL, " ");
+            char *newlinePos = strchr(processNameToken, '\n');
+            if (newlinePos != NULL) {
+                *newlinePos = '\0';
+            }
+
+            // Menulis ke file log
+            fprintf(logFile, "[%s]-%s-%s_JALAN\n", timestamp, pidToken, processNameToken);
+        }
+
+        // Menutup file
+        fclose(psFile);
+        fclose(logFile);
+
+        // Menghapus file ps_user.txt
+        remove("/home/irfanqs/modul2/soal_3/ps_user.txt");
+
+        // Delay sebelum iterasi berikutnya
+        sleep(1);
+    }
+}
+
+void killUserProcessToLog(char *namaUser) {
+    pid_t pid, sid; 
+    pid = fork();
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+    umask(0);
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if ((chdir("/home/irfanqs/modul2/soal_3/")) < 0) {
+        exit(EXIT_FAILURE);
+    }
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+  
+    // Membuat nama file log
+    char logFileName[100];
+    snprintf(logFileName, 100, "/home/irfanqs/modul2/soal_3/%s.log", namaUser);
+
+    // Loop utama
+    while(1) {
+        // Memanggil fungsi untuk menulis ps_user.txt
+        psUserToTXT(namaUser);
+
+        // Membuka file log untuk ditulis
+        FILE *logFile = fopen(logFileName, "a");
+        if (logFile == NULL) {
+            fprintf(stderr, "Error: Unable to open or create log file.\n");
+        }
+
+        // Membuka file ps_user.txt untuk dibaca
+        FILE *psFile = fopen("/home/irfanqs/modul2/soal_3/ps_user.txt", "r");
+        if (psFile == NULL) {
+            fprintf(stderr, "Error: Unable to open ps_user.txt.\n");
+            fclose(logFile);
+        }
+
+        // Membaca setiap baris dari file ps_user.txt dan menulis ke file log
+        char line[100];
+        while ((fgets(line, sizeof(line), psFile) != NULL)) {
+            // Menyimpan timestamp saat ini
+            time_t now;
+            struct tm *tm_info;
+            time(&now);
+            tm_info = localtime(&now);
+            char timestamp[100];
+            strftime(timestamp, 100, "%d:%m:%Y-%H:%M:%S", tm_info);
+            // Memecah baris menjadi token
+            char *nameToken = strtok(line, " ");
+            char *pidToken = strtok(NULL, " ");
+            char *processNameToken = strtok(NULL, " ");
+            char *newlinePos = strchr(processNameToken, '\n');
+            if (newlinePos != NULL) {
+                *newlinePos = '\0';
+            }
+
+                if (strcmp(processNameToken, "bash") == 0) {
+                    continue;
+                } else if (strcmp(processNameToken, "sh") == 0) {
+                    continue;
+                } else if (strcmp(processNameToken, "ps") == 0) {
+                    continue;
+                } else if (strcmp(processNameToken, "admin") == 0) {
+                    continue;
+                } else {
+                    pid_t targetPid = atoi(pidToken);
+                    kill(targetPid, SIGTERM);                       
+                    fprintf(logFile, "[%s]-%s-%s_GAGAL\n", timestamp, pidToken, processNameToken);
+                }        
+            sleep(1);    
+        }
+
+        // Menutup file
+        fclose(psFile);
+        fclose(logFile);
+
+        // Menghapus file ps_user.txt
+        remove("/home/irfanqs/modul2/soal_3/ps_user.txt");
+    }
+}
+
+void killAdmin() {
+  char *args[] = {"pkill", "admin", NULL}; // Ganti "admin" dengan nama proses yang ingin Anda hentikan
+    if (execvp("pkill", args) == -1) {
+        perror("Error executing pkill");
+        exit(EXIT_FAILURE);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    char *option = argv[1];
+    char *namaUser = argv[2];
+
+    if (strcmp(option, "-m") == 0) {
+      psUserToLog(namaUser);
+    } else if (strcmp(option, "-s") == 0) {
+       killAdmin();
+    } else if (strcmp(option, "-c") == 0) {
+       killUserProcessToLog(namaUser);
+    } else if (strcmp(option, "-a") == 0) {
+       killAdmin();
+    } else {
+       psUserToTerminal(option);
+    }
+    
+    return 0;
+}
+```
+- Pertama-tama kita membuat fungsi **psUserToTerminal**. Fungsi ini berfungsi untuk menjalankan `ps -u` dengan nama user dan memunculkannya di terminal.
+```c
+void psUserToTerminal(const char *namaUser) {
+    // Membuat command untuk mendapatkan informasi proses
+    char command[100];
+    snprintf(command, 100, "ps -u %s -o user,pid,comm", namaUser);
+
+    // Menjalankan command dan menulis output langsung ke terminal
+    FILE *fp = popen(command, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Error: Unable to execute command.\n");
+        return;
+    }
+
+    char output[100];
+    while (fgets(output, sizeof(output), fp) != NULL) {
+        printf("%s", output); // Output langsung ke terminal
+    }
+
+    // Menutup pipe
+    pclose(fp);
+}
+```
+- Lalu kita membuat fungsi **psUserToTXT**. Fungsi ini berfungsi untuk menjalankan `ps -u` dengan nama user lalu menyimpannya ke dalam suatu file.txt.
+```c
+void psUserToTXT(const char *namaUser) {
+    // Membuat command untuk mendapatkan informasi proses
+    char command[100];
+    snprintf(command, 100, "ps -u %s -o user,pid,comm --no-headers", namaUser);
+
+    // Membuka file ps_user.txt untuk menulis
+    FILE *outputFile = fopen("ps_user.txt", "w");
+    if (outputFile == NULL) {
+        fprintf(stderr, "Error: Unable to open or create output file.\n");
+        return;
+    }
+
+    // Menjalankan command dan menulis output ke file
+    FILE *fp = popen(command, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Error: Unable to execute command.\n");
+        fclose(outputFile);
+        return;
+    }
+
+    char output[100];
+    while (fgets(output, sizeof(output), fp) != NULL) {
+        fprintf(outputFile, "%s", output);
+    }
+
+    // Menutup file dan pipe
+    pclose(fp);
+    fclose(outputFile);
+}
+```
+- Kemudian kita membuat fungsi **psUserToLog**. Fungsi ini berfungsi untuk menjalankan `ps -u` dengan nama user lalu menyimpan setiap baris proses ke dalam file <nama user>.log berdasarkan format yang dibutuhkan. Proses ini berjalan secara *daemon*.
+```c
+void psUserToLog(const char *namaUser) {
+    pid_t pid, sid; 
+    pid = fork(); 
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+    umask(0);
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if ((chdir("/home/irfanqs/modul2/soal_3")) < 0) {
+        exit(EXIT_FAILURE);
+    }
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+  
+    // Membuat nama file log
+    char logFileName[100];
+    snprintf(logFileName, 100, "/home/irfanqs/modul2/soal_3/%s.log", namaUser);
+
+    // Menghapus file ps_user.txt (jika ada)
+    remove("ps_user.txt");
+
+    // Loop utama
+    while(1) {
+        // Memanggil fungsi untuk menulis ps_user.txt
+        psUserToTXT(namaUser);
+
+        // Membuka file log untuk ditulis
+        FILE *logFile = fopen(logFileName, "a");
+        if (logFile == NULL) {
+            fprintf(stderr, "Error: Unable to open or create log file.\n");
+            return;
+        }
+
+        // Menyimpan timestamp saat ini
+        time_t now;
+        struct tm *tm_info;
+        time(&now);
+        tm_info = localtime(&now);
+        char timestamp[100];
+        strftime(timestamp, 100, "%d:%m:%Y-%H:%M:%S", tm_info);
+
+        // Membuka file ps_user.txt untuk dibaca
+        FILE *psFile = fopen("/home/irfanqs/modul2/soal_3/ps_user.txt", "r");
+        if (psFile == NULL) {
+            fprintf(stderr, "Error: Unable to open ps_user.txt.\n");
+            fclose(logFile);
+            return;
+        }
+
+        // Membaca setiap baris dari file ps_user.txt dan menulis ke file log
+        char line[100];
+        while ((fgets(line, sizeof(line), psFile) != NULL)) {
+            // Memecah baris menjadi token
+            char *nameToken = strtok(line, " ");
+            char *pidToken = strtok(NULL, " ");
+            char *processNameToken = strtok(NULL, " ");
+            char *newlinePos = strchr(processNameToken, '\n');
+            if (newlinePos != NULL) {
+                *newlinePos = '\0';
+            }
+
+            // Menulis ke file log
+            fprintf(logFile, "[%s]-%s-%s_JALAN\n", timestamp, pidToken, processNameToken);
+        }
+
+        // Menutup file
+        fclose(psFile);
+        fclose(logFile);
+
+        // Menghapus file ps_user.txt
+        remove("/home/irfanqs/modul2/soal_3/ps_user.txt");
+
+        // Delay sebelum iterasi berikutnya
+        sleep(1);
+    }
+}
+```
+- Kemudian kita akan membuat fungsi **killUserProcessToLog**. Fungsi ini berfungsi untuk membunuh semua proses yang dilakukan user dan mencatatnya ke dalam file <nama user>.log. Pencatatan dilakukan setiap 1 detik. Fungsi ini bergantung kepada file txt yang menyimpan seluruh kegiatan yang dilakukan user, dan file ini dibuat dengan fungsi **psUserToTXT**.
+```c
+void killUserProcessToLog(char *namaUser) {
+    pid_t pid, sid; 
+    pid = fork();
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+    umask(0);
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if ((chdir("/home/irfanqs/modul2/soal_3/")) < 0) {
+        exit(EXIT_FAILURE);
+    }
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+  
+    // Membuat nama file log
+    char logFileName[100];
+    snprintf(logFileName, 100, "/home/irfanqs/modul2/soal_3/%s.log", namaUser);
+
+    // Loop utama
+    while(1) {
+        // Memanggil fungsi untuk menulis ps_user.txt
+        psUserToTXT(namaUser);
+
+        // Membuka file log untuk ditulis
+        FILE *logFile = fopen(logFileName, "a");
+        if (logFile == NULL) {
+            fprintf(stderr, "Error: Unable to open or create log file.\n");
+        }
+
+        // Membuka file ps_user.txt untuk dibaca
+        FILE *psFile = fopen("/home/irfanqs/modul2/soal_3/ps_user.txt", "r");
+        if (psFile == NULL) {
+            fprintf(stderr, "Error: Unable to open ps_user.txt.\n");
+            fclose(logFile);
+        }
+
+        // Membaca setiap baris dari file ps_user.txt dan menulis ke file log
+        char line[100];
+        while ((fgets(line, sizeof(line), psFile) != NULL)) {
+            // Menyimpan timestamp saat ini
+            time_t now;
+            struct tm *tm_info;
+            time(&now);
+            tm_info = localtime(&now);
+            char timestamp[100];
+            strftime(timestamp, 100, "%d:%m:%Y-%H:%M:%S", tm_info);
+            // Memecah baris menjadi token
+            char *nameToken = strtok(line, " ");
+            char *pidToken = strtok(NULL, " ");
+            char *processNameToken = strtok(NULL, " ");
+            char *newlinePos = strchr(processNameToken, '\n');
+            if (newlinePos != NULL) {
+                *newlinePos = '\0';
+            }
+
+                if (strcmp(processNameToken, "bash") == 0) {
+                    continue;
+                } else if (strcmp(processNameToken, "sh") == 0) {
+                    continue;
+                } else if (strcmp(processNameToken, "ps") == 0) {
+                    continue;
+                } else if (strcmp(processNameToken, "admin") == 0) {
+                    continue;
+                } else {
+                    pid_t targetPid = atoi(pidToken);
+                    kill(targetPid, SIGTERM);                       
+                    fprintf(logFile, "[%s]-%s-%s_GAGAL\n", timestamp, pidToken, processNameToken);
+                }        
+            sleep(1);    
+        }
+
+        // Menutup file
+        fclose(psFile);
+        fclose(logFile);
+
+        // Menghapus file ps_user.txt
+        remove("/home/irfanqs/modul2/soal_3/ps_user.txt");
+    }
+}
+```
+- Kemudian kita membuat fungsi **killAdmin**, di mana fungsi ini digunakan untuk membunuh program `./admin` yang sedang berjalan. 
+```c
+void killAdmin() {
+  char *args[] = {"pkill", "admin", NULL}; // Ganti "admin" dengan nama proses yang ingin Anda hentikan
+    if (execvp("pkill", args) == -1) {
+        perror("Error executing pkill");
+        exit(EXIT_FAILURE);
+    }
+}
+```
+- Setelah itu kita lanjut ke fungsi **main()**. Di dalam fungsi ini, kita mengatur input apa saja yang dibutuhkan untuk menjalankan fungsi-fungsi tertentu.
+```c
+int main(int argc, char *argv[]) {
+    char *option = argv[1];
+    char *namaUser = argv[2];
+
+    if (strcmp(option, "-m") == 0) {
+      psUserToLog(namaUser);
+    } else if (strcmp(option, "-s") == 0) {
+       killAdmin();
+    } else if (strcmp(option, "-c") == 0) {
+       killUserProcessToLog(namaUser);
+    } else if (strcmp(option, "-a") == 0) {
+       killAdmin();
+    } else {
+       psUserToTerminal(option);
+    }
+    
+    return 0;
+}
+```
+
+Untuk menjalankan program ini, kita perlu mencoba dengan `./admin <user>`
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/4787fc8a-8d7d-4cec-a611-daa0bf92c931)
+
+Selanjutnya, kita akan mencoba `./admin -m <user>` dan mengecek <user>.log
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/0302da43-be05-4e7b-b470-346f72d52308)
+<br>Program berjalan secara terus menerus dan berjalan dalam mode *daemon*<br>
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/5da8c549-111c-4b36-abfe-5d9efc61cff2)
+<br>Isi file irfanqs.log<br>
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/1024ab50-d031-4bf0-b26f-f35dd376eb5a)
+
+Selanjutnya, kita akan mencoba `./admin -s <user>' untuk membunuh proses sebelumnya
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/ab076f5a-2eb4-439a-b919-8b552c081d3f)
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/c686d028-06d1-4b5b-9236-49fa289dfd37)
+<br>Proses sebelumnya terbunuh
+
+Selanjutnya kita akan mencoba membunuh semua proses dengan `./admin -c <user>` dengan jeda satu detik
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/8f3d8ef7-04b9-4497-ab72-cc7932540f0c)
+<br>Mengecek jika program sedang berjalan terus menerus dalam mode daemon<br>
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/260fbafd-e04f-4d5b-b818-e8d6bc10730a)
+<br>Proses pembunuhan dicatat dalam file irfanqs.log setiap 1 detik<br>
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/86672664-a10a-4639-a564-f0f7effaf4aa)
+
+Selanjutnya, kita akan membunuh proses admin agar tidak membunuh semua proses dari user lagi dengan `./admin -a <user>`.
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/6869f6dc-abd8-4a15-9112-71c2e4813944)
+<br>Mengecek jika program benar-benar mati atau tidak dengan `ps aux`
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/7e3059e8-b16d-4e71-8bad-6e4ec2c5d58c)
+
+### Kendala
+Tidak ada kendala pada soal ini
+
+### Revisi
+Tidak ada revisi pada soal ini
+
 ## Soal 4
 <details><summary>Klik untuk melihat soal</summary>
 Salomo memiliki passion yang sangat dalam di bidang sistem operasi. Saat ini, dia ingin mengotomasi kegiatan-kegiatan yang ia lakukan agar dapat bekerja secara efisien. Bantulah Salomo untuk membuat program yang dapat mengotomasi kegiatan dia!

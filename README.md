@@ -24,7 +24,7 @@ String R4nS0mWaR3 direplace dengan string [RANSOMWARE]
 Program harus berjalan secara daemon, dan tidak diperbolehkan menggunakan command system() dalam pembuatan program
 Program akan secara terus menerus berjalan di background dengan jeda 15 detik
 Catat setiap penghapusan string yang dilakukan oleh program pada sebuah file bernama virus.log dengan format: [dd-mm-YYYY][HH:MM:SS] Suspicious string at <file_name> successfully replaced!
-</details><br>
+</details>
  
 ### Penjelasan
 Berikut merupakan isi dari file **virus.c**.
@@ -393,7 +393,8 @@ Contohnya:
 ./setup -k file.conf 
 Command ini hanya mematikan aplikasi yang dijalankan dengan 
 ./setup -f file.conf
-</details><br>
+</details>
+
 ### Penjelasan
 ### 1. buat **setup.c**
 

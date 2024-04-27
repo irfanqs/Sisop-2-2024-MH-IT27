@@ -588,7 +588,109 @@ void processFiles(char *mode) {
 
 ```
 
-Untuk menjalankan program ini, kita perlu mencoba dengan `./management <user>`
+Untuk menjalankan program ini, kita perlu mencoba dengan `./management`
+
+### Kendala
+Fungsi processFile tidak berjalan dengan baik sehingga beberapa file tidak terdekripsi, serta kurangnya fungsi-fungsi untuk mengerjakan poin selanjutnya.
+
+### Revisi
+Berikut adalah fungsi dekripsi dan mengganti nama file yang telah dibenahi dan sudah dapat bekerja dengan command `./management`
+```c
+void dekripsiROT19nChangeName(char *dirname){
+    struct dirent *ep;
+    DIR *dir = opendir(dirname);
+    pid_t pid = fork();
+    
+    if(pid == 0){
+        while ((ep = readdir(dir)) != NULL){
+             if (strcmp(ep->d_name, ".") != 0 && strcmp(ep->d_name, "..") != 0){
+                char ch, text[256];
+                int key = 19;
+                char oldFileName[500], newFileName[500];
+                sprintf(oldFileName, "%s/%s", dirname, ep->d_name);
+                strcpy(text, ep->d_name);
+
+                    if(text[0] < '0' || text[0] > '9'){
+                        for (int i = 0; text[i] != '\0'; ++i) {
+
+                            ch = text[i];
+                            
+                            if (isalnum(ch)) {
+                            
+                                if (islower(ch)) {
+                                    ch = (ch - 'a' - key + 26) % 26 + 'a';
+                                }
+                         
+                                if (isupper(ch)) {
+                                    ch = (ch - 'A' - key + 26) % 26 + 'A';
+                                }
+                            }
+                
+                            text[i] = ch;
+
+                            sprintf(newFileName, "%s/%s", dirname, text);
+                        }
+                        rename(oldFileName, newFileName);
+                    }
+            }
+        }
+        closedir(dir); 
+    } else {
+        int stat;
+        waitpid(pid, &stat, 0);
+    }
+}
+
+void renameAndDeleteAneh(char *dirname){
+    struct dirent *ep;
+    DIR *dir = opendir(dirname);
+    
+    pid_t pid = fork();
+    
+    if(pid == 0){
+        while ((ep = readdir(dir)) != NULL){
+            if (strcmp(ep->d_name, ".") != 0 && strcmp(ep->d_name, "..") != 0){
+                char strAneh[100];
+                char oldoldName[512], newnewName[512];
+                strcpy(strAneh, ep->d_name);
+
+                if(strstr(strAneh, "d3Let3") != NULL){
+                    sprintf(oldoldName, "%s/%s", dirname, ep->d_name);
+                    remove(oldoldName);
+                }else if (strstr(strAneh, "r3N4mE") != NULL){
+                    sprintf(oldoldName, "%s/%s", dirname, ep->d_name);
+                    if(strstr(strAneh, ".ts") != NULL){
+                        sprintf(newnewName, "%s/helper.ts", dirname);
+                        rename(oldoldName, newnewName);
+                    } else if (strstr(strAneh, ".py") != NULL){
+                        sprintf(newnewName, "%s/calculator.py", dirname);
+                        rename(oldoldName, newnewName);
+                    } else if (strstr(strAneh, ".go") != NULL){
+                        sprintf(newnewName, "%s/server.go", dirname);
+                        rename(oldoldName, newnewName);
+                    } else {
+                        sprintf(newnewName, "%s/renamed.file", dirname);
+                        rename(oldoldName, newnewName);
+                    }
+                } else {
+                    continue;
+                }
+            }
+        }
+        closedir(dir); 
+    } else {
+        int stat;
+        waitpid(pid, &stat, 0);
+    }
+}
+```
+
+Berikut adalah bukti bahwa file telah terganti namanya
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/d687249b-d030-4cda-9c26-142e3da8c921)
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/ab04f0f6-855f-4de3-b7bc-cf3c71824f58)
+<br> Beberapa file telah terganti namanya sesuai dengan soal<br>
+![image](https://github.com/irfanqs/Sisop-2-2024-MH-IT27/assets/130438307/0cecc076-50c8-4334-8ff6-6e97967791d4)
+
 
 ## Soal 3
 <details><summary>Klik untuk melihat soal</summary>
